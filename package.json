@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "start": "./node_modules/.bin/gitbook serve",
+    "build": "./node_modules/.bin/gitbook install && ./node_modules/.bin/gitbook build"
+  },
+  "dependencies": {
+    "gitbook-cli": "^2.3.2",
+    "gitbook-plugin-copy-code-button": "0.0.2",
+    "gitbook-plugin-expandable-chapters": "^0.2.0",
+    "gitbook-plugin-search-plus": "^1.0.3",
+    "gitbook-plugin-toc2": "^1.0.5"
+  }
+}

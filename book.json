@@ -1,0 +1,21 @@
+{
+    "title": "文档库",
+    "root": "./docs",
+    "plugins": [
+        "expandable-chapters",
+        "toc2",
+        "-lunr",
+        "-search",
+        "search-plus",
+        "copy-code-button"
+    ],
+    "pluginsConfig": {
+        "toc2": {
+            "addClass": true,
+            "className": "toc"
+        },
+        "disqus": {
+            "shortName": "gitbookuse"
+        }
+    }
+}
