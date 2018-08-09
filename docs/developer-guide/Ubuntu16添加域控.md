@@ -2,7 +2,7 @@
 
 - 下载 [PowerBroker Identity Services](https://github.com/BeyondTrust/pbis-open/releases/download/8.6.0/pbis-open-8.6.0.427.linux.x86_64.deb.sh)
 
-### 开始
+### 开始
 
 - 切换到root用户
 
@@ -10,14 +10,14 @@
     su root
 ```
 
-- 创建单独的账户，如 ITC180012
+- 创建临时账户，如 `ITC180012`
 
 ```
     useradd -g root -d /home/ITC180012 -m ITC180012
     passwd ITC180012
 ```
 
-- 将新建账户添加到域控中
+- 将新建的账户添加到域控中
 
 ```
     domainjoin-cli join --disable ssh itc.inventec ITC180012
@@ -32,10 +32,10 @@
 - 重启
 
 ```
-    reboot
+    reboot
 ```
 
-- 删除遗留
+- 删除临时账户
 
 ```
     userdel -r ITC180012
