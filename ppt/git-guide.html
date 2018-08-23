@@ -388,38 +388,42 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 </section>
   </div>
   <div class="slide hidden" id="slide-5">
-    <section class="slide-content"><h1 id="-">常用指令</h1>
+    <section class="slide-content"><p>附图</p>
 </section>
   </div>
   <div class="slide hidden" id="slide-6">
+    <section class="slide-content"><h1 id="-">常用指令</h1>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-7">
     <section class="slide-content"><h3 id="-">创建仓库</h3>
 <p>本地创建工作目录，在该目录的根目录下执行 git init 以初始化新的 git 仓库。</p>
 <p>不过在实际工作中，更推荐的做法是在 Gitlab 管理页面创建一个项目，一个项目即代表一个 git 库，之后通过克隆的方式将远端的仓库拉取到本地。</p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-7">
+  <div class="slide hidden" id="slide-8">
     <section class="slide-content"><h3 id="-">克隆代码</h3>
 <p>执行如下命令可以将远端服务器上的仓库拷贝到本地：</p>
 <p>git clone <a href="mailto:git@github.com">git@github.com</a>:jdan/cleaver.git (推荐)</p>
 <p>git clone <a href="https://github.com/jdan/cleaver.git">https://github.com/jdan/cleaver.git</a></p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-8">
+  <div class="slide hidden" id="slide-9">
     <section class="slide-content"><h3 id="-">查看分支</h3>
-<p>分支是用来将特性开发绝缘开来的。在你创建仓库的时候，master 是“默认的”。在其他分支上进行开发，完成后再将它们合并到主分支上。</p>
+<p>在开发过程中，分支是绕不开的话题，不同的分支代表着推进中的各功能项以及bug修复，我们可以通过以下命令查看我们的功能分支</p>
 <p>查看当前分支: git branch<br>
 查看远程分支: git branch -r<br>
 查看所有分支: git branch -a<br>
 切换当前分支: git checkout &lt;branch><br></p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-9">
+  <div class="slide hidden" id="slide-10">
     <section class="slide-content"><h3 id="-">新建分支</h3>
 <p>当你需要创建一个叫做 feature_x 新分支的时候，首先应该明确它基于哪个基础分支，是基于 master ，还是某一个 feature 分支，再或者是一个集成分支，必须先把这一点明确了。至于命令超简单：</p>
 <p>git checkout -b &lt;branch></p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-10">
+  <div class="slide hidden" id="slide-11">
     <section class="slide-content"><h3 id="-">修改及提交</h3>
 <p>当你需要将修改的内容提交的时候，与传统SVN的提交不同，此时需要经过两步操作，首先将已修改的内容添加至暂存区，当确认无误之后再将暂存区的内容进行提交，并且在提交过程中必须指定备注信息：</p>
 <p>git status<br>
@@ -430,31 +434,33 @@ git commit -m &quot;备注信息&quot;<br>
 git commit -am &quot;备注信息&quot;<br></p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-11">
+  <div class="slide hidden" id="slide-12">
     <section class="slide-content"><h3 id="-">推送改动</h3>
 <p>上面提到的操作仅是将修改的内容保存至本地的 Git 库，并没有同步至远端，此时可以通过执行如下命令将其同步至远端仓库：</p>
 <p>git push origin master</p>
 <p>可以把 master 换成你想要推送的任何分支，但要明确的是Push代码的时候指定的分支参数应该与当前所在分支名一致</p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-12">
+  <div class="slide hidden" id="slide-13">
     <section class="slide-content"><h3 id="-">拉取更新</h3>
 <p>当我们 push 代码的时候，理想情况下一步到位没啥异常，但如果是多人协同开发的时候，代码冲突在所难免，即便没有冲突，那也需要在提交前先 pull 最新的代码,所以在提交之前，先习惯性的 git pull 最新的代码.</p>
 <p>如果没有冲突，谢天谢地呀，那可以直接 push 了.<br>
 如果存在冲突，就需要先解决冲突，解决冲突也很简单，只需要按照 git pull 时提示的异常信息操作即可，也可以依赖 IDE 解决冲突，这一点和 SVN 没啥本质区别。</p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-13">
+  <div class="slide hidden" id="slide-14">
     <section class="slide-content"><h3 id="-log">查看Log</h3>
 <p>git log</p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-14">
+  <div class="slide hidden" id="slide-15">
     <section class="slide-content"><h3 id="-">合并分支</h3>
-<p>待完善</p>
+<p>当开发的功能完成之后，需要将开发过程中创建的功能分支合并到主分支上。</p>
+<p>git merge</p>
+<p>需要注意的是，A 分支要合并至 B 分支的时候，需要先将当前分支切换至 B 分支，然后执行 git merge A，千万千万别想反了</p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-15">
+  <div class="slide hidden" id="slide-16">
     <section class="slide-content"><h3 id="-">标签</h3>
 <p>在软件发布时创建标签，是被推荐的。这是个旧有概念，在 SVN 中也有。可以执行如下命令以创建一个叫做 1.0.0 的标签：</p>
 <p>git tag 1.0.0 1b2e1d63ff</p>
@@ -463,11 +469,11 @@ git commit -am &quot;备注信息&quot;<br></p>
 <p>你也可以用该提交 ID 的少一些的前几位，只要它是唯一的。</p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-16">
+  <div class="slide hidden" id="slide-17">
     <section class="slide-content"><h1 id="-">优势</h1>
 </section>
   </div>
-  <div class="slide hidden" id="slide-17">
+  <div class="slide hidden" id="slide-18">
     <section class="slide-content"><h3 id="a-list-of-things">A list of things</h3>
 <ul>
 <li>Item 1</li>
@@ -476,20 +482,20 @@ git commit -am &quot;备注信息&quot;<br></p>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-18">
+  <div class="slide hidden" id="slide-19">
     <section class="slide-content"><h1 id="-">工作流</h1>
 <h2 id="-">如何更好地管理代码</h2>
 </section>
   </div>
-  <div class="slide hidden" id="slide-19">
+  <div class="slide hidden" id="slide-20">
     <section class="slide-content"><p><img src="" alt="link"></p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-20">
+  <div class="slide hidden" id="slide-21">
     <section class="slide-content"><h1 id="-">致谢</h1>
 </section>
   </div>
-  <div class="slide hidden author-slide" id="slide-21">
+  <div class="slide hidden author-slide" id="slide-22">
     <section class="slide-content"><div class="author">
   <h1 class="name">Zhang.Xing-Long</h1>
     <h3 class="url">
