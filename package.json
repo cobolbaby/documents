@@ -1,13 +1,16 @@
 {
   "scripts": {
-    "start": "./node_modules/.bin/gitbook serve",
-    "build": "./node_modules/.bin/gitbook install && ./node_modules/.bin/gitbook build"
+    "book": "./node_modules/.bin/gitbook serve",
+    "build": "./node_modules/.bin/gitbook install && ./node_modules/.bin/gitbook build",
+    "ppt": "./node_modules/.bin/cleaver ppt/* && ./node_modules/.bin/serve"
   },
   "dependencies": {
+    "cleaver": "^0.8.7",
     "gitbook-cli": "^2.3.2",
     "gitbook-plugin-copy-code-button": "0.0.2",
     "gitbook-plugin-expandable-chapters": "^0.2.0",
     "gitbook-plugin-search-plus": "^1.0.3",
-    "gitbook-plugin-toc2": "^1.0.5"
+    "gitbook-plugin-toc2": "^1.0.5",
+    "serve": "^10.0.0"
   }
 }

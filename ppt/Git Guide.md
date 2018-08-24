@@ -2,8 +2,9 @@ title: Git Guide
 author:
   name: Zhang.Xing-Long
   url: https://github.com/cobolbaby
-output: git-guide.html
-controls: true
+  email: Zhang.Xing-long@inventec.com
+output: _ppt/git-guide.html
+theme: jdan/cleaver-retro
 
 --
 
