@@ -2,7 +2,7 @@
   "scripts": {
     "book": "./node_modules/.bin/gitbook serve",
     "build": "./node_modules/.bin/gitbook install && ./node_modules/.bin/gitbook build",
-    "ppt": "./node_modules/.bin/cleaver ppt/* && ./node_modules/.bin/serve"
+    "ppt": "./node_modules/.bin/cleaver ppt/*.md && ./node_modules/.bin/serve"
   },
   "dependencies": {
     "cleaver": "^0.8.7",

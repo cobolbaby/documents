@@ -15,23 +15,60 @@ theme: jdan/cleaver-retro
 
 ### 目标
 
-* 了解核心的概念
+* 了解基本概念
 * 掌握常用指令
 * 明确工作流
 
 --
 
-# 核心概念
+# 基本概念
 
 --
 
-### A textual example
+### 概念
 
-你的本地仓库由 git 维护的三棵“树”组成。第一个是你的 工作目录，它持有实际文件；第二个是 缓存区（Index），它像个缓存区域，临时保存你的改动；最后是 HEAD，指向你最近一次提交后的结果。
+* Git - 分布式版本控制系统
+* SVN - 集中式版本控制系统
 
 --
 
-附图
+### 三棵“树”
+
+本地仓库由 git 维护的三棵“树”组成。
+
+第一个是你的工作目录，它持有实际文件；<br>
+第二个是暂存区(Index)，它像个缓存区域，临时保存你的改动；<br>
+最后是HEAD，指向你最近一次提交后的结果。<br>
+
+--
+
+### 有图有真相
+
+<img src="http://marklodato.github.io/visual-git-guide/basic-usage.svg" style="width: 100%; background-color: white;">
+
+--
+
+### 优势
+
+* 支持离线工作
+
+开发者可以在没有服务器连接的情况下执行提交、创建分支、版本标签等操作。之后再将其上传服务器。
+
+* 支持强大的分支管理
+
+开发者可通过多个本地分支在不同任务之间进行快速切换。
+
+--
+
+### 优势
+
+* 生态圈
+
+GitHub, BitBucket,GitLab
+
+* 更加安全可靠
+
+由于每个开发者都持有一份拥有完整历史版本的版本库副本，所以因服务器故障而导致数据丢失的可能性是微乎其微的。
 
 --
 
@@ -110,7 +147,7 @@ git push origin master
 
 ### 查看Log
 
-git log
+简单暴力 git log，不过更推荐在 Gitlab 中直接查看
 
 --
 
@@ -138,24 +175,21 @@ git log
 
 --
 
-# 优势
-
---
-
-### A list of things
-
-* Item 1
-* Item B
-* Item gamma
-
---
-
 # 工作流
-## 如何更好地管理代码
+## 更好地进行代码开发
 
 --
 
-![link]()
+### 分之管理
+
+<img src="https://note.youdao.com/yws/api/personal/file/WEB7a96ac8f29901b359fb4e462f2a2f845?method=download&amp;shareKey=055bcb1fc16ce24e693e6d79687543a5" alt="分支管理" style="width: 100%;">
+
+--
+
+### 指南和手册
+
+* [官方手册](https://git-scm.com/)
+* [图解Git](http://rogerdudler.github.io/git-guide/index.zh.html)
 
 --
 
