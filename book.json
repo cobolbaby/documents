@@ -13,9 +13,6 @@
         "toc2": {
             "addClass": true,
             "className": "toc"
-        },
-        "disqus": {
-            "shortName": "gitbookuse"
         }
     }
 }
