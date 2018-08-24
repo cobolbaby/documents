@@ -98,7 +98,7 @@ git clone https://github.com/jdan/cleaver.git
 
 在开发过程中，分支是绕不开的话题，不同的分支代表着推进中的各功能项以及bug修复，我们可以通过以下命令查看我们的功能分支
 
-查看当前分支: git branch<br>
+查看当前分支: git branch<br>
 查看远程分支: git branch -r<br>
 查看所有分支: git branch -a<br>
 切换当前分支: git checkout <branch\><br>
@@ -107,7 +107,7 @@ git clone https://github.com/jdan/cleaver.git
 
 ### 新建分支
 
-当你需要创建一个叫做 feature_x 新分支的时候，首先应该明确它基于哪个基础分支，是基于 master ，还是某一个 feature 分支，再或者是一个集成分支，必须先把这一点明确了。至于命令超简单：
+当你需要创建一个叫做 feature_x 新分支的时候，首先应该明确它基于哪个基础分支，是基于 master ，还是某一个 feature 分支，再或者是一个集成分支，必须先把这一点明确了。至于命令超简单：
 
 git checkout -b <branch\>
 
@@ -115,24 +115,24 @@ git checkout -b <branch\>
 
 ### 修改及提交
 
-当你需要将修改的内容提交的时候，与传统SVN的提交不同，此时需要经过两步操作，首先将已修改的内容添加至暂存区，当确认无误之后再将暂存区的内容进行提交，并且在提交过程中必须指定备注信息：
+当你需要将修改的内容提交的时候，与传统SVN的提交不同，此时需要经过两步操作，首先将已修改的内容添加至暂存区，当确认无误之后再将暂存区的内容进行提交，并且在提交过程中必须指定备注信息：
 
 git status<br>
 git add <filename\> <br>
 git add .<br>
 git status<br>
-git commit -m "备注信息"<br>
-git commit -am "备注信息"<br>
+git commit -m "备注信息"<br>
+git commit -am "备注信息"<br>
 
 --
 
 ### 推送改动
 
-上面提到的操作仅是将修改的内容保存至本地的 Git 库，并没有同步至远端，此时可以通过执行如下命令将其同步至远端仓库：
+上面提到的操作仅是将修改的内容保存至本地的 Git 库，并没有同步至远端，此时可以通过执行如下命令将其同步至远端仓库：
 
 git push origin master
 
-可以把 master 换成你想要推送的任何分支，但要明确的是Push代码的时候指定的分支参数应该与当前所在分支名一致
+可以把 master 换成你想要推送的任何分支，但要明确的是Push代码的时候指定的分支参数应该与当前所在分支名一致
 
 --
 
@@ -153,7 +153,7 @@ git push origin master
 
 ### 合并分支
 
-当开发的功能完成之后，需要将开发过程中创建的功能分支合并到主分支上。
+当开发的功能完成之后，需要将开发过程中创建的功能分支合并到主分支上。
 
 git merge
 
