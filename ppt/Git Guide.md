@@ -25,36 +25,37 @@ theme: jdan/cleaver-retro
 
 --
 
-### 概念
+### 集中式vs分布式
 
-* Git - 分布式版本控制系统
-* SVN - 集中式版本控制系统
-
---
-
-### 三棵“树”
-
-本地仓库由 git 维护的三棵“树”组成。
-
-第一个是你的工作目录，它持有实际文件；<br>
-第二个是暂存区(Index)，它像个缓存区域，临时保存你的改动；<br>
-最后是HEAD，指向你最近一次提交后的结果。<br>
+简介：
 
 --
 
-### 有图有真相
+### 本地仓库的三颗"树"
 
-<img src="http://marklodato.github.io/visual-git-guide/basic-usage.svg" style="width: 100%; background-color: white;">
+Git本地仓库可以分为三个区
+
+1、工作区（working directory）
+
+2、暂缓区（stage index）
+
+3、历史记录区（history）
+
+--
+
+### 本地仓库的三颗"树"
+
+<img src="https://note.youdao.com/yws/api/personal/file/WEB3f566bec96a38bc042d7dd767ff9b884?method=download&shareKey=1166885fdd960e911796cde9f6fad93f" style="width: 100%;">
 
 --
 
 ### 优势
 
-* 支持离线工作
+1、支持离线工作
 
 开发者可以在没有服务器连接的情况下执行提交、创建分支、版本标签等操作。之后再将其上传服务器。
 
-* 支持强大的分支管理
+2、支持强大的分支管理
 
 开发者可通过多个本地分支在不同任务之间进行快速切换。
 
@@ -62,11 +63,11 @@ theme: jdan/cleaver-retro
 
 ### 优势
 
-* 生态圈
+3、生态圈
 
 GitHub, BitBucket,GitLab
 
-* 更加安全可靠
+4、更加安全可靠
 
 由于每个开发者都持有一份拥有完整历史版本的版本库副本，所以因服务器故障而导致数据丢失的可能性是微乎其微的。
 
