@@ -9,3 +9,4 @@
 * 运维手册
     * Docker
         * [Docker Guide](operation/docker/Docker Guide.md)
+        * [Docker Swarm](operation/docker/Docker Swarm.md)
