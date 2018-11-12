@@ -100,14 +100,14 @@ sudo systemctl restart docker.service
 - 拉取镜像
 
 ```
-    docker pull harbor.inventec.com/development/python:2.7
+docker pull harbor.inventec.com/development/python:2.7
 ```
 
 - 上传镜像
 
 ```
-    docker tag <CONTAINER_ID> harbor.inventec.com/development/python:2.7
-    docker push harbor.inventec.com/development/python:2.7
+docker tag <CONTAINER_ID> harbor.inventec.com/development/python:2.7
+docker push harbor.inventec.com/development/python:2.7
 ```
 
 > 在Push之前需要登录私服，以指定推送的地址 `docker login harbor.inventec.com`
