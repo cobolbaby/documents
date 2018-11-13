@@ -24,6 +24,8 @@ docker-compose 是用于容器编排的工具，通过一个配置文件定义�
 
 ### Swarm基础概念
 
+![swarm-architecture](https://msdnshared.blob.core.windows.net/media/2017/02/SwarmOverlayFunctionalView-1024x811.png)
+
 #### Swarm Mode
 
 从 Docker v1.12 开始，集群管理和编排功能已经集成进 Docker Engine。当 Docker Engine 执行 Swarm 初始化或者加入到一个存在的 Swarm 集群中时，它就启动了`Swarm Mode` 。
@@ -40,6 +42,8 @@ Manager Node 负责执行编排和集群管理工作。Swarm 中如果有多个 
 
 Worker Node 接受并执行派发的任务。默认配置下 Manager Node 同时也是一个 Worker Node ，不过可以将其配置成 `Manager-Only Node`，让其专职负责编排和集群管理工作。
 
+![swarm-node](https://docs.docker.com/engine/swarm/images/swarm-diagram.png)
+
 #### Service
 
 Service 定义了 Worker Node 上要执行的任务。
@@ -50,6 +54,8 @@ Manager Node 负责创建这个 Service，经过分析知道需要启动 3 个 n
 
 运行了一段时间，Worker2 突然宕机了，Manager Node 监控到这个故障，于是立即在 Worker3 上启动了一个新的 nginx 容器。这样就保证了 Service 处于期望的三个副本状态。
 
+![swarm-service](https://docs.docker.com/engine/swarm/images/services-diagram.png)
+
 #### Stack
 
 Stack 定义了由若干 Service 构成的服务堆栈，用于描述一个完整的应用。
@@ -58,7 +64,7 @@ Stack 定义了由若干 Service 构成的服务堆栈，用于描述一个完�
 
 #### 初始化
 
-```
+```bash
 # Manager Node 执行
 docker swarm init --advertise-addr 10.190.5.110
 # Worker Node 执行
@@ -67,39 +73,81 @@ docker swarm join --token SWMTKN-1-44xebmqerko0v8y3mxlaz00xc6supwol8ub4sbs9kvtl1
 
 #### 查看节点
 
-```
+```bash
 # Manager Node 执行
 docker node ls
 ```
 
-#### 启动服务
+#### 初始化网络
+
+```bash
+docker network create --driver overlay --subnet=10.11.0.0/16 --attachable <NETWORKNAME>
+```
+
+#### 编写compose.yml文件
+
+示例如下:
 
 ```
+version: "3.3"
+services:
+  mdw:
+    image: ${REGISTRY}/${TAGNAME}
+    hostname: mdw
+    ports:
+      - "5432:5432"
+    volumes:
+      - /opt/greenplum/config:/opt/greenplum/config
+      - /disk1:/disk1
+    deploy:
+      mode: replicated
+      replicas: 1
+      # resources:
+      #   limits:
+      #     cpus: "0.1"
+      #     memory: 50M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints: 
+          - node.role == manager
+
+networks:
+  default:
+    external:
+      name: gpdb
+```
+
+#### 启动服务
+
+```bash
 docker stack deploy -c docker-compose.yml <STACKNAME>
 ```
 
 #### 查看状态
 
-```
+```bash
 docker stack ps --no-trunc <STACKNAME>
 docker service ls
 ```
 
 #### 扩容缩容
 
-```
+```bash
 docker service scale <SERVICENAME>=5
 ```
 
 #### 关闭服务
 
-```
+```bash
 docker stack rm <STACKNAME>
 ```
 
 ####  更新服务
 
-```
+```bash
 docker service update <STACKNAME_SERVICENAME> --image harbor.inventec.com/development/nginx:latest
 ```
 
@@ -137,5 +185,7 @@ Swarm 服务有一个`endpoint_mode`配置来设置负载均衡的策略，可�
 
 ### 参考资料
 
-- https://www.cnblogs.com/CloudMan6/tag/Swarm/
-- https://docs.docker.com/engine/swarm/
+- [官方文档](https://docs.docker.com/engine/swarm/)
+- [Docker从入门到实践](https://yeasy.gitbooks.io/docker_practice/swarm_mode/)
+- [CloudMan](https://www.cnblogs.com/CloudMan6/tag/Swarm/)
+- [Overlay Network Driver on Windows ](https://blogs.technet.microsoft.com/virtualization/2017/02/09/overlay-network-driver-with-support-for-docker-swarm-mode-now-available-to-windows-insiders-on-windows-10/)
