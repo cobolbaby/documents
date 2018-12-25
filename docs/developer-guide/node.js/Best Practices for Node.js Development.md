@@ -8,7 +8,7 @@
 
 ### 2. Use built-in modules
 
-尽量使用系统内置的模块，而不引入第三方模块
+尽量使用Node.js内置的模块，而不引入第三方库
 
 ### 3. Static Resource
 
@@ -33,7 +33,7 @@
 - 同步读取文件
 - gzip
 - md5sum
-- 递归setTimeout
+- nested setTimeout
 
 ### 7. Promise Performance
 
@@ -51,9 +51,9 @@
 
 ### 10. JSON Serialize
 
-JSON序列化优化在Java中很常见，在其他语言中其实也是个话题，类似的还有Protobuffer协议性能问题。
+JSON序列化优化在Java/Go中很常见，在其他语言中其实也是个话题，类似的还有Protobuffer协议性能问题。
 
-常见的验证库 [ajv](https://ajv.js.org) 就是使用 [fast-json-stringify](https://github.com/fastify/fast-json-stringify) 提升JSON解析的性能
+可采用 [fast-json-stringify](https://github.com/fastify/fast-json-stringify) 提升JSON解析的性能，但会增加编写的代码量，影响代码可读性。
 
 ### 11. Template Cache
 
@@ -95,6 +95,8 @@ JSON序列化优化在Java中很常见，在其他语言中其实也是个话题
 
 最好将validator抽象出来，别混在业务逻辑里面，如sails的input参数校验，koa不知道有没有类似的插件
 
+参考: [ajv](https://ajv.js.org/)
+
 ### 20. Emit
 
 观察者模式的实现，用于解耦程序，不过要注意`EventEmitter.emit`是同步方法呦。当然也可以借助MQ实现订阅发布。
@@ -127,3 +129,7 @@ Sails.js支不支持该模式？反正 [Egg](https://eggjs.org/en/advanced/clust
 - [中间件执行模块koa-Compose源码分析](https://segmentfault.com/a/1190000013447551)
 - [以中间件，路由，跨进程事件的姿势使用WebSocket](https://segmentfault.com/a/1190000016914790)
 - [4类 JavaScript 内存泄漏及如何避免](https://jinlong.github.io/2016/05/01/4-Types-of-Memory-Leaks-in-JavaScript-and-How-to-Get-Rid-Of-Them/)
+- [How JavaScript works: memory management + how to handle 4 common memory leaks](https://blog.sessionstack.com/how-javascript-works-memory-management-how-to-handle-4-common-memory-leaks-3f28b94cfbec)
+- [JavaScript内存泄漏教程](http://www.ruanyifeng.com/blog/2017/04/memory-leak.html)
+- [The beautiful thing called EventEmitter](https://dev.to/tunaxor/the-beautiful-thing-called-eventemitter-23ei)
+- [How to validate user input in a Node.js application](https://rethinkdb.com/blog/validation-techniques/)
