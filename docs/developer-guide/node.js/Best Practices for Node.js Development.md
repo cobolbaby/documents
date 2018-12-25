@@ -12,7 +12,7 @@
 
 ### 3. Static Resource
 
-静态资源让Nginx去管，也方便以后迁移至CDN
+静态资源让Nginx去管，避免不必要的负载，也方便以后采用CDN
 
 ### 4. Router Cache
 
@@ -28,12 +28,12 @@
 
 ### 6. Sync I/O
 
-用异步尽量别用同步代码，毕竟Node.js是单线程的，同步代码会阻塞线程执行。同时也可能造成内存溢出
+用异步尽量别用同步代码，毕竟Node.js是单线程的，同步代码会阻塞线程执行。即便是异步代码，也要注意是否会引起内存溢出
 
-- 同步文件读取
-- 正则匹配
-- 10w+循环赋值
-- Gzip压缩
+- 同步读取文件
+- gzip
+- md5sum
+- 递归setTimeout
 
 ### 7. Promise Performance
 
@@ -47,11 +47,13 @@
 
 ### 9. Stream
 
-文件转存，请求代理，建议用Stream
+文件转存(非文件上传)，请求代理，建议用Stream
 
 ### 10. JSON Serialize
 
-JSON序列化优化在Java中很常见，在其他语言中其实也是个话题，类似的还有Protobuffer协议性能问题
+JSON序列化优化在Java中很常见，在其他语言中其实也是个话题，类似的还有Protobuffer协议性能问题。
+
+常见的验证库 [ajv](https://ajv.js.org) 就是使用 [fast-json-stringify](https://github.com/fastify/fast-json-stringify) 提升JSON解析的性能
 
 ### 11. Template Cache
 
@@ -67,11 +69,13 @@ JSON序列化优化在Java中很常见，在其他语言中其实也是个话题
 
 ### 14. GC
 
-新生代频繁回收问题
+新生代频繁回收问题，原理参考一下JVM的垃圾回收
 
 ### 15. Safety
 
-做好跨站脚本攻击的防护，一定要做异常防护，不然网站入口就挂了。不过最好也买一个web防火墙(百度云加速)
+一定要做安防，不然网站入口挂了那就惨了。最好买一个web防火墙(百度云加速)
+
+除了需要防御常规的跨站请求攻击，XSS，有时也需要考虑限流方案。
 
 ### 16. PM2
 
@@ -81,7 +85,7 @@ JSON序列化优化在Java中很常见，在其他语言中其实也是个话题
 
 ### 17. Template Engine
 
-让代码更加优雅
+让代码更加优雅，方便单独调试静态页面，不必依赖于后端渲染。
 
 ### 18. Module Development
 
@@ -103,7 +107,9 @@ JSON序列化优化在Java中很常见，在其他语言中其实也是个话题
 
 ### 22. Cluster Mode
 
-[Node.js Cluster](http://nodejs.cn/api/cluster.html) 工作模式
+[Node.js Cluster](http://nodejs.cn/api/cluster.html) 工作模式，总结一下哪些框架支持该种运行模式，常见的应用场景有图片渲染(不可能为每个请求都创建一个puppeteer/phantom实例)
+
+Sails.js支不支持该模式？反正 [Egg](https://eggjs.org/en/advanced/cluster-client.html) 支持
 
 其中也涉及到一个问题 -- 惊群
 
@@ -119,3 +125,5 @@ JSON序列化优化在Java中很常见，在其他语言中其实也是个话题
 - [Compare with pm2 and Forever](http://strong-pm.io/compare/)
 - [最快的PHP路由](http://www.symfonychina.com/blog/new-in-symfony-4-1-fastest-php-router)
 - [中间件执行模块koa-Compose源码分析](https://segmentfault.com/a/1190000013447551)
+- [以中间件，路由，跨进程事件的姿势使用WebSocket](https://segmentfault.com/a/1190000016914790)
+- [4类 JavaScript 内存泄漏及如何避免](https://jinlong.github.io/2016/05/01/4-Types-of-Memory-Leaks-in-JavaScript-and-How-to-Get-Rid-Of-Them/)
