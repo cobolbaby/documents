@@ -1,14 +1,14 @@
 [TOC]
 
-## Node.js Optimize
+## 参考指南
 
 ### 1. Node.js Version
 
-新版的Node.js在性能上只会更优
+新版的Node.js在性能上只会更优，可参考:  [benchmarking.nodejs.org](https://benchmarking.nodejs.org/)
 
 ### 2. Use built-in modules
 
-尽量使用Node.js内置的模块，而不引入第三方库
+尽量使用Node.js内置的模块，而不引入第三方库，当然此事要把握好一个度。
 
 ### 3. Static Resource
 
@@ -28,12 +28,7 @@
 
 ### 6. Sync I/O
 
-用异步尽量别用同步代码，毕竟Node.js是单线程的，同步代码会阻塞线程执行。即便是异步代码，也要注意是否会引起内存溢出
-
-- 同步读取文件
-- gzip
-- md5sum
-- nested setTimeout
+用异步尽量别用同步代码，毕竟Node.js是单线程的，同步代码会阻塞线程执行。比如: 文件操作，Gzip。
 
 ### 7. Promise Performance
 
@@ -43,7 +38,7 @@
 
 ### 8. Parallel Process
 
-能并行绝对不串行，缩短响应时间，如果是在做爬虫，请注意别太嚣张，不然很容易触发对方的底线
+能并行绝对不串行，缩短响应时间，如果是在做爬虫，请注意别太嚣张，不然很容易触发对方的底线(屏蔽请求)
 
 ### 9. Stream
 
@@ -51,21 +46,21 @@
 
 ### 10. JSON Serialize
 
-JSON序列化优化在Java/Go中很常见，在其他语言中其实也是个话题，类似的还有Protobuffer协议性能问题。
+JSON序列化优化在Java/Go中很常见，在其他语言中其实也是个话题，类似的还有ProtoBuffer协议性能问题。
 
 可采用 [fast-json-stringify](https://github.com/fastify/fast-json-stringify) 提升JSON解析的性能，但会增加编写的代码量，影响代码可读性。
 
 ### 11. Template Cache
 
-针对模板，先考虑用缓存，然后再考虑重新组装。尤其是做后端渲染的时候，一定要利用好。
+针对模板，先考虑用缓存，然后再考虑重新拼接。尤其是做后端渲染的时候，一定要考虑。
 
 ### 12. Gzip Compress
 
-适当压缩会减少请求的网络时延，在弱网络环境下必要做,，但最好是让Nginx去做Gzip压缩。
+适当压缩会减少请求的网络时延，在弱网络环境下必须考虑。但Gzip相对而言占用较多CPU资源，阻塞主线程，所以压缩操作最好在其他进程或线程中去做。而Node.js单线程的特点决定了无法很好的利用多核CPU，所以最好是让Nginx去做Gzip压缩。
 
 ### 13. Middleware Sequence
 
-考虑调整中间件顺序，请求能早响应就别拖到最后。
+调整中间件顺序可用于简化某些业务请求的处理流程，减少某些请求的响应体大小。但调整时一定要明白Express与Koa中间件的执行顺序，不懂原理的话结果可能不会符合预期。
 
 ### 14. GC
 
@@ -93,7 +88,7 @@ JSON序列化优化在Java/Go中很常见，在其他语言中其实也是个话
 
 ### 19. Context Validator
 
-最好将validator抽象出来，别混在业务逻辑里面，如sails的input参数校验，koa不知道有没有类似的插件
+最好将validator抽离出来，别混在业务逻辑里面，如Sails的input参数校验，koa不知道有没有类似的插件
 
 参考: [ajv](https://ajv.js.org/)
 
@@ -115,21 +110,36 @@ Sails.js支不支持该模式？反正 [Egg](https://eggjs.org/en/advanced/clust
 
 其中也涉及到一个问题 -- 惊群
 
-## Reference
+### 23. Memory Usage
 
-- [Node.js内存溢出-process out of memory 问题的处理](https://niefengjun.cn/blog/62277f34c6ed048fac91583bd6214ddb.html)
+要注意内存溢出或内存使用不当的问题
+
+- Nested setTimeout
+- Closure
+- FileReader
+
+## 必读物
+
 - [你不知道的Node.js性能优化](https://zhuanlan.zhihu.com/p/50055740)
 - [Node.js的10个性能优化技巧](https://www.jb51.net/article/52187.htm)
 - [基于Node.js的苏宁电商核心业务实践](https://myslide.cn/slides/9796)
 - [苏宁Nodejs性能优化实战](https://mp.weixin.qq.com/s/JxRO5BhJai-tT6xWvFpKgQ)
 - [数组的遍历你都会用了，那Promise版本的呢](https://segmentfault.com/a/1190000014598785)
-- [background_jobs_node](https://github.com/evantahler/background_jobs_node/blob/master/3-local.js)
+- [evantahler/background_jobs_node](https://github.com/evantahler/background_jobs_node/blob/master/3-local.js)
 - [Compare with pm2 and Forever](http://strong-pm.io/compare/)
 - [最快的PHP路由](http://www.symfonychina.com/blog/new-in-symfony-4-1-fastest-php-router)
-- [中间件执行模块koa-Compose源码分析](https://segmentfault.com/a/1190000013447551)
+- [中间件执行模块koa-compose源码分析](https://segmentfault.com/a/1190000013447551)
 - [以中间件，路由，跨进程事件的姿势使用WebSocket](https://segmentfault.com/a/1190000016914790)
 - [4类 JavaScript 内存泄漏及如何避免](https://jinlong.github.io/2016/05/01/4-Types-of-Memory-Leaks-in-JavaScript-and-How-to-Get-Rid-Of-Them/)
 - [How JavaScript works: memory management + how to handle 4 common memory leaks](https://blog.sessionstack.com/how-javascript-works-memory-management-how-to-handle-4-common-memory-leaks-3f28b94cfbec)
 - [JavaScript内存泄漏教程](http://www.ruanyifeng.com/blog/2017/04/memory-leak.html)
 - [The beautiful thing called EventEmitter](https://dev.to/tunaxor/the-beautiful-thing-called-eventemitter-23ei)
 - [How to validate user input in a Node.js application](https://rethinkdb.com/blog/validation-techniques/)
+- [使用Node.js实现文件流转存服务](https://github.com/andycall/blog/issues/1)
+- [树结构遍历 —— 深度优先和广度优先](https://www.pandashen.com/2018/07/02/20180702122923/)
+- [Koa源码分析](https://www.pandashen.com/2018/09/02/20180902141819/)
+- [爬虫的广度优先和深度优先算法](https://www.cnblogs.com/wangshuyi/p/6734523.html)
+- [i0natan/nodebestpractices](https://github.com/i0natan/nodebestpractices)
+- [Egg.js设计原则](https://eggjs.org/zh-cn/intro/index.html)
+- [Backpressuring in Streams](https://nodejs.org/en/docs/guides/backpressuring-in-streams/)
+- [Express中间件摆放顺序之坑](https://go.kieran.top/post/34/)

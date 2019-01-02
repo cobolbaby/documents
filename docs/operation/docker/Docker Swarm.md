@@ -157,31 +157,52 @@ docker service update <STACKNAME_SERVICENAME> --image harbor.inventec.com/develo
 
 ### Swarm常见问题
 
-#### 挂载目录
+#### Volume Mount
 
 最最最常见的问题，如果在`docker-compose.yml`文件中指定了外部挂载目录，但宿主机尚未创建该目录，容器就会无法启动。
 
 详细报错信息可`docker stack ps --no-trunc <STACKNAME>`指令查看
 
-#### 网络问题
+#### Overlay Network
 
-如果重启 Manager Node 所在宿主机，则可能会出现集群中容器网络无法互通的问题，比如 Manager Node 上的容器无法`ping`通 Worker Node 上运行的容器，此时最有效的方法是**重建网络**
+如果重启 Manager Node 所在宿主机，则可能会出现集群中容器网络无法互通的问题，比如 Manager Node 上的容器无法`ping`通 Worker Node 上运行的容器。还有节点更换IP也会造成集群网络出问题(服务治理异常)。此时最有效的方法是**重建网络**
 
-#### 服务更新
+除了网络稳定性不好之外，关于原生Overlay性能问题有待考量
 
-当服务滚动更新后，服务有时可能会无法访问。最常见的是 Nginx 反向代理的服务，原因也比较简单： Nginx 启动时会将反向代理的服务地址进行`DNS`解析并且缓存，如果此时更新 Nginx 反代的服务，会造成服务`IP`的动态分配，如果`IP`有所变化，那就意味着 Nginx 无法按照原来解析的地址进行请求转发，造成服务无法访问的问题。所以如果是滚动更新 Nginx 反代的服务，建议同时对 Nginx 热重载
+#### Rolling Update
 
-#### 负载策略
+当服务滚动更新后，服务有时可能会无法访问。最常见的是 Nginx 反向代理的服务，原因也比较简单： Nginx 启动时会将反向代理的服务地址进行`DNS`解析并且缓存，如果此时更新 Nginx 反代的服务，会造成服务`IP`的动态分配，如果`IP`有所变化，那就意味着 Nginx 无法按照原来解析的地址进行请求转发，造成服务无法访问的问题。所以如果是滚动更新 Nginx 反代的服务，建议在nginx.conf配置`resolver`
 
-Swarm 服务有一个`endpoint_mode`配置来设置负载均衡的策略，可以选择`vip`或`dnsrr`，分别代表着`Virtual IP`以及`DNS Round Robin`负载均衡策略，默认的策略为`vip`。但服务容器化的时候，难免会遇到一些比较特殊的存在，比如`greenplum`，因其`socket`绑定的`host`为容器的`IP`而非`0.0.0.0`，所以此时如果仍然使用`vip`的负载策略，就会造成`greenplum`数据节点无法提供服务。
+#### Load Balance
 
-#### 固定节点
+Swarm 服务有一个`endpoint_mode`配置来设置负载均衡的策略，可以选择`vip`或`dnsrr`，分别代表着`Virtual IP`以及`DNS Round Robin`负载均衡策略，默认的策略为`vip`。
 
-对于有状态的容器，比如数据库，在做集群部署的时候为了确保持久化的数据被加载，此时就需要保证在 Worker Node 上有固定的容器在运行。为此就需要在`docker-compose.yml`配置文件中明确指定容器固定部署于哪个节点上。
+但服务容器化的时候，难免会遇到一些比较特殊的存在。
+比如`greenplum`，程序`socket`绑定的`host`为容器的`IP`而非`0.0.0.0`，当负载策略仍然使用`vip`的话，请求数据包路由至某节点之后，解包发现目的地址与实际监听的地址不符，连接就会失败。
 
-#### 跨节点数据卷
+#### Routing Mesh
 
-`cross-host mounted volumes`被指很不可靠，所以从一开始就不建议使用该特性
+可以理解为路由代理，不过实现的效果可能未必是自己想要的，毕竟每个Node都需要暴露开放端口，增大的安全风险。
+
+> The ingress network is a special overlay network that facilitates load balancing among a service’s nodes. When **any swarm node receives a request on a published port**, it hands that request off to a module called IPVS. IPVS keeps track of all the IP addresses participating in that service, selects one of them, and routes the request to it, over the ingress network.
+
+#### Persistent Volume
+
+考虑到IO性能问题，跨节点数据卷暂不考虑。此处仅说本地数据卷。
+
+有状态的容器在做集群部署的时候，比如数据库，为了确保持久化的数据被加载，就需要运行指定的容器。所以在`docker-compose.yml`配置文件中明确指定容器固定部署于哪个节点上。
+
+#### Crontab
+
+Docker官方并没有为定时任务提供很好的管控方式，所以很多时候还得借助于第三方。而如果仅依赖系统的crontab，管理起来又略显混乱。
+
+#### Software Ecosystem
+
+很多优秀的软件并没有提供Swarm部署模式的官方支持。比如：Spark/Greenplum/Kong
+
+#### Extensibility
+
+网络/存储方案相对固化，不利于定制。而K8S扩展性更强，更容易在许多业务场景中落地
 
 ### 参考资料
 
@@ -189,3 +210,12 @@ Swarm 服务有一个`endpoint_mode`配置来设置负载均衡的策略，可�
 - [Docker从入门到实践](https://yeasy.gitbooks.io/docker_practice/swarm_mode/)
 - [CloudMan](https://www.cnblogs.com/CloudMan6/tag/Swarm/)
 - [Overlay Network Driver on Windows ](https://blogs.technet.microsoft.com/virtualization/2017/02/09/overlay-network-driver-with-support-for-docker-swarm-mode-now-available-to-windows-insiders-on-windows-10/)
+- [Swarm Mode: Overlay networks intermittently stop working](https://github.com/moby/moby/issues/28325)
+- [Nginx does not automatically pick up DNS changes in Swarm](https://stackoverflow.com/questions/46660436/nginx-does-not-automatically-pick-up-dns-changes-in-swarm)
+- [Configure Service Discovery](https://docs.docker.com/v17.09/engine/swarm/networking/#configure-service-discovery)
+- [Swarm Native Service Discovery](https://success.docker.com/article/networking)
+- [探索 Docker Bridge 的正确姿势](http://blog.daocloud.io/docker-bridge/)
+- [Kubernetes NodePort vs LoadBalancer vs Ingress](https://medium.com/google-cloud/kubernetes-nodeport-vs-loadbalancer-vs-ingress-when-should-i-use-what-922f010849e0)
+- [Think about NodePort in Kubernetes](https://oteemo.com/2017/12/12/think-nodeport-kubernetes/)
+- [Swarm mode should support batch/cron jobs](https://github.com/moby/moby/issues/23880)
+- [Benchmark results of Kubernetes network plugins](https://itnext.io/benchmark-results-of-kubernetes-network-plugins-cni-over-10gbit-s-network-36475925a560)
