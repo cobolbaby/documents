@@ -157,52 +157,111 @@ docker service update <STACKNAME_SERVICENAME> --image harbor.inventec.com/develo
 
 ### Swarm常见问题
 
-#### Volume Mount
+#### 1) Volume Mount
 
 最最最常见的问题，如果在`docker-compose.yml`文件中指定了外部挂载目录，但宿主机尚未创建该目录，容器就会无法启动。
 
 详细报错信息可`docker stack ps --no-trunc <STACKNAME>`指令查看
 
-#### Overlay Network
+#### 2) Overlay Network
 
 如果重启 Manager Node 所在宿主机，则可能会出现集群中容器网络无法互通的问题，比如 Manager Node 上的容器无法`ping`通 Worker Node 上运行的容器。还有节点更换IP也会造成集群网络出问题(服务治理异常)。此时最有效的方法是**重建网络**
 
 除了网络稳定性不好之外，关于原生Overlay性能问题有待考量
 
-#### Rolling Update
+#### 3) Rolling Update
 
 当服务滚动更新后，服务有时可能会无法访问。最常见的是 Nginx 反向代理的服务，原因也比较简单： Nginx 启动时会将反向代理的服务地址进行`DNS`解析并且缓存，如果此时更新 Nginx 反代的服务，会造成服务`IP`的动态分配，如果`IP`有所变化，那就意味着 Nginx 无法按照原来解析的地址进行请求转发，造成服务无法访问的问题。所以如果是滚动更新 Nginx 反代的服务，建议在nginx.conf配置`resolver`
 
-#### Load Balance
+#### 4) Routing Mesh
 
-Swarm 服务有一个`endpoint_mode`配置来设置负载均衡的策略，可以选择`vip`或`dnsrr`，分别代表着`Virtual IP`以及`DNS Round Robin`负载均衡策略，默认的策略为`vip`。
+Swarm部署的时候会涉及到一个配置 [endpoint_mode](https://docs.docker.com/compose/compose-file/#deploy)，作用引官方的说法:
+
+> Specify a service discovery method for external clients connecting to a swarm.
+
+有两个选项`vip`或`dnsrr`，分别代表着`Virtual IP`以及`DNS Round Robin`策略，默认的策略为`vip`。
+
+> By default, swarm services which publish ports do so using the routing mesh. When you connect to a published port on any swarm node (whether it is running a given service or not), you are redirected to a worker which is running that service, transparently. Effectively, Docker acts as a load balancer for your swarm services. Services using the routing mesh are running in virtual IP (VIP) mode. Even a service running on each node (by means of the --mode global flag) uses the routing mesh. When using the routing mesh, there is no guarantee about which Docker node services client requests.
+>
+> To bypass the routing mesh, you can start a service using DNS Round Robin (DNSRR) mode, by setting the --endpoint-mode flag to dnsrr. You must run your own load balancer in front of the service. A DNS query for the service name on the Docker host returns a list of IP addresses for the nodes running the service. Configure your load balancer to consume this list and balance the traffic across the nodes.
 
 但服务容器化的时候，难免会遇到一些比较特殊的存在。
-比如`greenplum`，程序`socket`绑定的`host`为容器的`IP`而非`0.0.0.0`，当负载策略仍然使用`vip`的话，请求数据包路由至某节点之后，解包发现目的地址与实际监听的地址不符，连接就会失败。
+比如`greenplum`，程序`socket`绑定的`host`为容器的`IP`而非`0.0.0.0`，当路由策略仍使用`vip`的话，请求数据包路由至某节点之后，解包发现目的地址与实际监听的地址不符，请求失败。
 
-#### Routing Mesh
+#### 5) Ingress Network
 
-可以理解为路由代理，不过实现的效果可能未必是自己想要的，毕竟每个Node都需要暴露开放端口，增大的安全风险。
+Ingress 解决的问题是如何对外提供服务，不过结果可能未必是自己想要的，因为每个Node都需要暴露开放端口，增大的安全风险。
 
 > The ingress network is a special overlay network that facilitates load balancing among a service’s nodes. When **any swarm node receives a request on a published port**, it hands that request off to a module called IPVS. IPVS keeps track of all the IP addresses participating in that service, selects one of them, and routes the request to it, over the ingress network.
 
-#### Persistent Volume
+具体实现原理，可瞅一下宿主机的`sudo iptables -L -t nat --line-numbers -v -n`
 
-考虑到IO性能问题，跨节点数据卷暂不考虑。此处仅说本地数据卷。
+```
+Chain DOCKER-INGRESS (2 references)
+num   pkts bytes target     prot opt in     out     source               destination         
+1      279 14508 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:48082 to:172.19.0.2:48082
+2      204 10608 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:48081 to:172.19.0.2:48081
+3      193 10036 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:28082 to:172.19.0.2:28082
+4      135  7020 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:28081 to:172.19.0.2:28081
+5      112  5824 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:58082 to:172.19.0.2:58082
+6      148  7696 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:58081 to:172.19.0.2:58081
+7      272 14133 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:38082 to:172.19.0.2:38082
+8      187  9724 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:38081 to:172.19.0.2:38081
+9      174  9048 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:18082 to:172.19.0.2:18082
+10     114  5928 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:18081 to:172.19.0.2:18081
+11    2644  138K DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:8081 to:172.19.0.2:8081
+12       0     0 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:7077 to:172.19.0.2:7077
+13       0     0 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:6066 to:172.19.0.2:6066
+14    2533  132K DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4040 to:172.19.0.2:4040
+15       0     0 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:8080 to:172.19.0.2:8080
+16    378K   22M DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:5432 to:172.19.0.2:5432
+17     29M 3169M RETURN     all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+```
 
-有状态的容器在做集群部署的时候，比如数据库，为了确保持久化的数据被加载，就需要运行指定的容器。所以在`docker-compose.yml`配置文件中明确指定容器固定部署于哪个节点上。
+可不可以配置一个外部负载均衡器，代理后端所有服务节点???
 
-#### Crontab
+#### 6) Bind Persistent Volume
+
+举个数据库的例子，数据库的多个容器实例分别绑定不同的存储数据。对于这些容器实例来说，第一次读取到的数据，和隔了十分钟之后再次读取到的数据，应该是同一份，哪怕在此期间容器实例被重新创建过。因此往往需要将容器实例与持久化数据卷进行绑定。
+
+#### 7) Cronjob
 
 Docker官方并没有为定时任务提供很好的管控方式，所以很多时候还得借助于第三方。而如果仅依赖系统的crontab，管理起来又略显混乱。
 
-#### Software Ecosystem
+#### 8) Software Ecosystem
 
 很多优秀的软件并没有提供Swarm部署模式的官方支持。比如：Spark/Greenplum/Kong
 
-#### Extensibility
+#### 9) Microservices Sidecar Pattern
 
-网络/存储方案相对固化，不利于定制。而K8S扩展性更强，更容易在许多业务场景中落地
+没有容器组的概念，所以Sidecar部署比较难落地。
+
+#### 10) Failover
+
+某节点中容器运行一段时间之后就重启，初步考虑有两个原因：
+
+- 容器中程序异常退出
+
+- 节点内存资源不足引发的OOM异常
+
+    采用增加内存的方式验证
+
+- 节点网络联通问题引发的故障切换
+
+    先用`tcpdump`抓下数据包，如果`tcp`连接有问题，则用`mtr`测一下网络传输会不会有丢包，如果丢包率较高，换张网卡或者重插一下网线看看能否解决问题
+    
+    不过有篇文章说了另外一个观点：[不要开启tcp_tw_recycle](https://ieevee.com/tech/2017/07/19/tcp-tw-recycle.html)，也不知道说的对不对？
+
+    
+```
+CONTAINER ID        IMAGE                                         COMMAND                  CREATED             STATUS                        PORTS               NAMES
+813bfc1d4202        harbor.inventec.com/development/gpdb:4.3.25   "./entrypoint.sh"        4 hours ago         Exited (137) 3 hours ago                          gpdb_segment_sdw1.1.6mt9svwae6jhcadj3a5pmof7d
+c7f5a6614f18        harbor.inventec.com/development/gpdb:4.3.25   "./entrypoint.sh"        4 hours ago         Exited (137) 4 hours ago                          gpdb_segment_sdw1.1.25vt3xzhrhkbxxlgkl4kp0781
+```
+
+#### 11) Keepalived
+
+不支持，Keepalived并不能用Swarm部署，只能采用Host网络，而K8S官方就有支持。从中也可以看出K8S可以覆盖更多高可用的使用场景。
 
 ### 参考资料
 
@@ -210,12 +269,22 @@ Docker官方并没有为定时任务提供很好的管控方式，所以很多�
 - [Docker从入门到实践](https://yeasy.gitbooks.io/docker_practice/swarm_mode/)
 - [CloudMan](https://www.cnblogs.com/CloudMan6/tag/Swarm/)
 - [Overlay Network Driver on Windows ](https://blogs.technet.microsoft.com/virtualization/2017/02/09/overlay-network-driver-with-support-for-docker-swarm-mode-now-available-to-windows-insiders-on-windows-10/)
-- [Swarm Mode: Overlay networks intermittently stop working](https://github.com/moby/moby/issues/28325)
+- [Swarm Mode: Overlay networks intermittently stop working](https://forums.docker.com/t/docker-worker-nodes-shown-as-down-after-re-start/22329) 宿主机重启的危害
 - [Nginx does not automatically pick up DNS changes in Swarm](https://stackoverflow.com/questions/46660436/nginx-does-not-automatically-pick-up-dns-changes-in-swarm)
 - [Configure Service Discovery](https://docs.docker.com/v17.09/engine/swarm/networking/#configure-service-discovery)
 - [Swarm Native Service Discovery](https://success.docker.com/article/networking)
-- [探索 Docker Bridge 的正确姿势](http://blog.daocloud.io/docker-bridge/)
+- [探索 Docker Bridge 的正确姿势](http://blog.daocloud.io/docker-bridge/) 了解一下DNAT/SNAT
 - [Kubernetes NodePort vs LoadBalancer vs Ingress](https://medium.com/google-cloud/kubernetes-nodeport-vs-loadbalancer-vs-ingress-when-should-i-use-what-922f010849e0)
 - [Think about NodePort in Kubernetes](https://oteemo.com/2017/12/12/think-nodeport-kubernetes/)
 - [Swarm mode should support batch/cron jobs](https://github.com/moby/moby/issues/23880)
 - [Benchmark results of Kubernetes network plugins](https://itnext.io/benchmark-results-of-kubernetes-network-plugins-cni-over-10gbit-s-network-36475925a560)
+- [Docker swarm mode - connection refused when binding to overlay network interface](https://github.com/moby/moby/issues/30874) endpoint_mode配置
+- [Binding Persistent Volumes by Labels](https://docs.okd.io/latest/install_config/storage_examples/binding_pv_by_label.html#binding-pv-by-label-pv-with-labels)
+- [开启iptables情况下Swarm、Kubernetes等组件正常工作的配置](https://blog.csdn.net/A632189007/article/details/78909835)
+- [Docker Swarm添加了太多iptables规则，且很多重复的，怎么处理](https://segmentfault.com/q/1010000015272794?_ea=3861870)
+- [我的容器崩掉了](https://wumingxiaozu.com/2016/01/22/ComputerScience/Docker/%E6%88%91%E7%9A%84Docker%E7%A8%8B%E5%BA%8F%E5%B4%A9%E6%8E%89%E4%BA%86/)
+- [Out Of Memory Exceptions (OOME)](https://docs.docker.com/config/daemon/#out-of-memory-exceptions-oome)
+- [Docker Swarm管理节点高可用分析](http://zhoujinl.github.io/2018/10/19/docker-swarm-manager-ha/)
+- [Bypass the routing mesh for a swarm service](https://docs.docker.com/network/overlay/) 两种路由策略
+- [Blocking ingress traffic to Docker swarm worker machines](https://ops.tips/blog/blocking-ingress-traffic-to-docker-swarm-worker-machines/) Ingress网络安全
+- [How to run docker-compose on remote host](https://stackoverflow.com/questions/35433147/how-to-run-docker-compose-on-remote-host) 使用docker-compose将容器指定部署到远程宿主机
