@@ -89,9 +89,10 @@ systemctl restart docker.service
 
 ```
 sudo mkdir -p /etc/systemd/system/docker.service.d/
-sudo echo '[Service]
-Environment="HTTP_PROXY=http://[proxy-addr]:[proxy-port]/" "HTTPS_PROXY=https://[proxy-addr]:[proxy-port]/"
- "NO_PROXY=localhost,127.0.0.1,harbor.inventec.com"' > /etc/systemd/system/docker.service.d/http-proxy.conf
+cat <<EOF | sudo tee --append /etc/systemd/system/docker.service.d/http-proxy.conf
+[Service]
+Environment="HTTP_PROXY=http://10.190.40.39:18118/" "HTTPS_PROXY=http://10.190.40.39:18118/" "NO_PROXY=localhost,127.0.0.1,10.0.0.0/8,harbor.inventec.com"
+EOF
 sudo systemctl daemon-reload
 sudo systemctl restart docker.service
 ```
