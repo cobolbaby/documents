@@ -2,11 +2,9 @@
 
 * [简介](README.md)
 
-* 新手指南
-    * [Ubuntu16 Join Windows AD](developer-guide/Ubuntu16 Join Windows AD.md)
-
 * 运维手册
-    * Docker
-        * [Docker Guide](operation/docker/Docker Guide.md)
-        * [Docker Swarm](operation/docker/Docker Swarm.md)
-        * [Harbor Docker Repo](operation/docker/Harbor Docker Repo.md)
+    * [The Value Of Containerization](operation/The Value Of Containerization.md)
+    * [Docker Swarm](operation/Docker Swarm.md)
+    * [Harbor Docker Repo](operation/Harbor Docker Repo.md)
+    * [Ubuntu16 Join Windows AD](developer-guide/Ubuntu16 Join Windows AD.md)
+    * [运维监控平台概述](operation/运维监控平台.md)

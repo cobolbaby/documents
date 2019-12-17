@@ -1,6 +1,6 @@
 ### 准备工作
 
-- 下载 [PowerBroker Identity Services](https://github.com/BeyondTrust/pbis-open/releases)
+- 下载 [PowerBroker Identity Services](https://github.com/BeyondTrust/pbis-open/releases/download/8.6.0/pbis-open-8.6.0.427.linux.x86_64.deb.sh)
 
 ### 开始
 
@@ -33,4 +33,10 @@
 
 ```
     reboot
+```
+
+- 删除临时账户
+
+```
+    userdel -r ITC180012
 ```
