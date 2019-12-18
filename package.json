@@ -9,8 +9,10 @@
     "gitbook-cli": "^2.3.2",
     "gitbook-plugin-copy-code-button": "0.0.2",
     "gitbook-plugin-expandable-chapters": "^0.2.0",
-    "gitbook-plugin-search-plus": "^1.0.3",
-    "gitbook-plugin-toc2": "^1.0.5",
+    "gitbook-plugin-expandable-chapters-small": "^0.1.7",
+    "gitbook-plugin-prism": "^2.4.0",
+    "gitbook-plugin-prism-themes": "0.0.2",
+    "gitbook-plugin-simple-page-toc": "^0.1.2",
     "serve": "^10.0.0"
   }
 }

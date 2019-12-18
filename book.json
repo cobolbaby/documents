@@ -3,16 +3,21 @@
     "root": "./docs",
     "plugins": [
         "expandable-chapters",
-        "toc2",
-        "-lunr",
-        "-search",
-        "search-plus",
-        "copy-code-button"
+        "copy-code-button",
+        "simple-page-toc",
+        "prism",
+        "prism-themes",
+        "-highlight"
     ],
     "pluginsConfig": {
-        "toc2": {
-            "addClass": true,
-            "className": "toc"
+        "simple-page-toc": {
+            "maxDepth": 4,
+            "skipFirstH1": true
+        },
+        "prism": {
+            "css": [
+                "prism-themes/themes/prism-material-dark.css"
+            ]
         }
     }
 }
