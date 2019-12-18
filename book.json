@@ -7,7 +7,10 @@
         "simple-page-toc",
         "prism",
         "prism-themes",
-        "-highlight"
+        "-highlight",
+        "-lunr",
+        "-search",
+        "search-plus"
     ],
     "pluginsConfig": {
         "simple-page-toc": {
